@@ -1,11 +1,6 @@
 import NextAuth from "next-auth"
 import authConfig from "@/auth.config"
-import {
-  DEFAULT_LOGIN_REDIRECT,
-  apiAuthPrefix,
-  authRoutes,
-  publicRoutes,
-} from "@/routes"
+import { DEFAULT_LOGIN_REDIRECT, authRoutes, publicRoutes } from "@/routes"
 
 const { auth } = NextAuth(authConfig)
 
@@ -15,7 +10,6 @@ export default auth(async (req) => {
 
   const isApiRoute = req.nextUrl.pathname.startsWith("/api")
   const isBankRoute = req.nextUrl.pathname.startsWith("/banks")
-  const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix)
   const isPublicRoute = publicRoutes.includes(nextUrl.pathname)
   const isAuthRoute = authRoutes.includes(nextUrl.pathname)
 

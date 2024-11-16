@@ -40,7 +40,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
 
       if (session.user) {
-        session.user.username = token.userName as string
+        session.user.username = token.username as string
         session.user.isOAuth = token.isOauth as boolean
         session.user.isActivated = token.isActivated as boolean
         session.user.isAdmin = token.isAdmin as boolean
