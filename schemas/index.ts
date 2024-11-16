@@ -17,7 +17,6 @@ export const ProfileSchema = z
     password: z.optional(z.string().min(6)),
     newPassword: z.optional(z.string().min(6)),
     isActivated: z.boolean().optional().default(true),
-    image: z.optional(z.string()),
   })
   .refine(
     (data) => {

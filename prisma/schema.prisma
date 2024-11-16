@@ -52,3 +52,23 @@ model Session {
   updatedAt DateTime @updatedAt
 }
  
+
+
+model Seller {
+  id            String         @id @default(cuid())
+  name          String        @unique
+  products      Product[]
+}
+
+model Product {
+  id            String         @id @default(cuid())
+  sellerId      String
+  date          DateTime
+  price         Float
+  quantity      Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  seller Seller @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+}
