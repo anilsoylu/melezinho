@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## NextJS
 
-## Getting Started
+### Prerequisites
 
-First, run the development server:
+Node version 20.x
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Cloning the repository
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+    git clone https://github.com/anilsoylu/anilsoylu-new.git
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Install packages
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+    npm i
 
-## Learn More
+### Setup .env file
 
-To learn more about Next.js, take a look at the following resources:
+    DATABASE_URL=
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+    ADMIN_USERNAME=
+    ADMIN_PASSWORD=
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+    Running commands with pnpm `pnpm dlx auth secret`
+    NEXTAUTH_URL=
+    AUTH_SECRET=
+    NEXT_PUBLIC_RESEND_API_KEY=
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+    NEXT_PUBLIC_APP_URL=
+    NEXT_PUBLIC_IMG_URL=
+    NEXT_PUBLIC_API_URL=
+    NEXT_PUBLIC_MAIL_ADDRESS=
+    NEXT_PUBLIC_APP_NAME=
+    NEXT_PUBLIC_APP_DESCRIPTION=
+    NEXT_PUBLIC_API_SECRET_TOKEN=
+    NEXT_PUBLIC_PANEL_USER_ID=
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Setup Prisma
+
+    npm run db:seed
+    npm run db:generate
+    npm run db:migrate
+    npm run db:push
+
+### Start the app
+
+    npm run dev
+
+### Available commands
+
+Running commands with npm `npm run [command]`
+
+| command | description                              |
+| ------- | ---------------------------------------- |
+| `dev`   | Starts a development instance of the app |
+|         |
