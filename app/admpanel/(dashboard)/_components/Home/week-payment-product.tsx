@@ -10,8 +10,8 @@ type Props = {
   productList: ProductType[]
 }
 
-const CARD_TITLE = "Bugün Hafta Tutar"
-const TOTAL_PREFIX = "Bugün hafta tutar:"
+const CARD_TITLE = "Bu Hafta Tutar"
+const TOTAL_PREFIX = "Bu hafta tutar:"
 
 const WeekPaymenTokens = ({ productList }: Props) => {
   const weekPayment = useMemo(() => {
@@ -23,7 +23,7 @@ const WeekPaymenTokens = ({ productList }: Props) => {
             : product.date // Eğer string ise Date'e çevir
         return product.isActivated && isSameWeek(date, new Date())
       }) // Tarih bugünün tarihi mi?
-      .reduce((acc, product) => acc + product.price, 0)
+      .reduce((acc, product) => acc + product.price * product.quantity, 0)
   }, [productList])
 
   return (

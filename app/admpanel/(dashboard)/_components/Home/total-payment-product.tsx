@@ -3,7 +3,6 @@ import { memo, useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { CreditCard } from "lucide-react"
 import { ProductType } from "@/types/product"
-import { isToday } from "date-fns"
 import { formatCurrency } from "@/lib/utils"
 
 type Props = {
@@ -19,7 +18,7 @@ const TotalPaymentTokens = ({ productList }: Props) => {
       .filter((product) => {
         return product.isActivated
       }) // Tarih bugünün tarihi mi?
-      .reduce((acc, product) => acc + product.price, 0)
+      .reduce((acc, product) => acc + product.price * product.quantity, 0)
   }, [productList])
 
   return (

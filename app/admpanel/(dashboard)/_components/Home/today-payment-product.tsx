@@ -23,7 +23,7 @@ const TodayPaymenTokens = ({ productList }: Props) => {
             : product.date // Eğer string ise Date'e çevir
         return product.isActivated && isToday(date)
       }) // Tarih bugünün tarihi mi?
-      .reduce((acc, product) => acc + product.price, 0)
+      .reduce((acc, product) => acc + product.price * product.quantity, 0)
   }, [productList])
 
   return (
