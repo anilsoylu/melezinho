@@ -11,11 +11,11 @@ import Wait from "@/hooks/use-wait"
 
 import DataError from "@/components/data-error"
 import Loading from "@/components/Loading"
-import { TOKEN_API } from "@/types/api-list"
+import { SELLER_API, TOKEN_API } from "@/types/api-list"
 import ProductDataTable from "./_components/data-table"
 import { handleDelete } from "@/lib/apiHelpers"
 import { tokenApi } from "@/types/api-folder"
-import { ProductType } from "@/types/product"
+import { ProductType, SellerType } from "@/types/product"
 
 const PageClient = () => {
   const { isBlock, setIsBlock } = useBlock()
@@ -24,6 +24,8 @@ const PageClient = () => {
   const user = useCurrentUser()
 
   const { data: tokenListData, isError } = useFetcher<ProductType[]>(TOKEN_API)
+  const { data: sellerListData, isError: isSellerError } =
+    useFetcher<SellerType[]>(SELLER_API)
 
   const title = "Token Listesi"
   const description =
@@ -70,14 +72,15 @@ const PageClient = () => {
     }
   }
 
-  if (isError)
+  if (isError || isSellerError)
     return <DataError type="Seller listesi alınırken bir hata oluştu." />
-  if (!tokenListData) return <Loading />
+  if (!tokenListData || !sellerListData) return <Loading />
 
   return (
     <div className="max-w-sm md:max-w-full">
       <ProductDataTable
         tokenListData={tokenListData}
+        sellerListData={sellerListData}
         title={title}
         folder={folder}
         description={description}

@@ -35,7 +35,7 @@ import { getColumns } from "./columns"
 import { CalendarIcon, ListFilter, PlusCircle } from "lucide-react"
 import SelectedDeleteRows from "./select-delete"
 import { dashboardPrefix } from "@/app/admpanel/(dashboard)/routes"
-import { ProductType } from "@/types/product"
+import { ProductType, SellerType } from "@/types/product"
 import {
   Popover,
   PopoverContent,
@@ -66,6 +66,7 @@ type Props = {
   title: string
   description: string
   folder: string
+  sellerListData: SellerType[]
   tokenListData: ProductType[]
   onDeleteProduct(productId: string): void
 }
@@ -81,6 +82,7 @@ const ProductDataTable = ({
   title,
   description,
   folder,
+  sellerListData,
   tokenListData,
   onDeleteProduct,
 }: Props) => {
@@ -144,6 +146,10 @@ const ProductDataTable = ({
     setFilteredData(
       tokenListData.filter((item) => item.isActivated === isActivated)
     )
+  }
+
+  const handleSellerFilter = (sellerId: string) => {
+    setFilteredData(tokenListData.filter((item) => item.sellerId === sellerId))
   }
 
   const columns: ColumnDef<any, any>[] = getColumns(
@@ -243,6 +249,41 @@ const ProductDataTable = ({
             <Button
               variant="outline"
               size="sm"
+              className="h-7 gap-1 w-full lg:w-auto"
+            >
+              <ListFilter className="h-3.5 w-3.5" />
+              <span className="sm:whitespace-nowrap">Satıcılar</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Filtrelenmiş</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {sellerListData.map((seller) => (
+              <DropdownMenuCheckboxItem
+                key={seller.id}
+                className="capitalize"
+                checked={filteredData.some(
+                  (item) => item.sellerId === seller.id
+                )}
+                onCheckedChange={() => handleSellerFilter(seller.id)}
+              >
+                {seller.name}
+              </DropdownMenuCheckboxItem>
+            ))}
+            <DropdownMenuSeparator />
+            <DropdownMenuCheckboxItem
+              className="capitalize"
+              onCheckedChange={() => setFilteredData(tokenListData)}
+            >
+              Clear Filter (Filtreyi Temizle)
+            </DropdownMenuCheckboxItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
               className="h-7 w-full lg:w-auto gap-1"
             >
               <ListFilter className="h-3.5 w-3.5" />
@@ -254,12 +295,14 @@ const ProductDataTable = ({
             <DropdownMenuSeparator />
             <DropdownMenuCheckboxItem
               className="capitalize"
+              checked={filteredData.some((item) => item.isPaid)}
               onCheckedChange={() => handlePaymentFilter(true)} // Ödenmiş kayıtları göster
             >
               Paid (Ödenmiş)
             </DropdownMenuCheckboxItem>
             <DropdownMenuCheckboxItem
               className="capitalize"
+              checked={filteredData.some((item) => !item.isPaid)}
               onCheckedChange={() => handlePaymentFilter(false)} // Ödenmemiş kayıtları göster
             >
               Unpaid (Ödenmemiş)
@@ -289,12 +332,14 @@ const ProductDataTable = ({
             <DropdownMenuSeparator />
             <DropdownMenuCheckboxItem
               className="capitalize"
+              checked={filteredData.some((item) => item.isActivated)}
               onCheckedChange={() => handleActivationFilter(true)}
             >
               Active (Aktif)
             </DropdownMenuCheckboxItem>
             <DropdownMenuCheckboxItem
               className="capitalize"
+              checked={filteredData.some((item) => !item.isActivated)}
               onCheckedChange={() => handleActivationFilter(false)}
             >
               Inactive (Pasif)
