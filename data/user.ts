@@ -10,6 +10,8 @@ const getUser = async (whereClause: Prisma.UserWhereUniqueInput) => {
   } catch (error) {
     console.error("Veritabanı hatası:", error)
     return null
+  } finally {
+    await db.$disconnect() // Veritabanı bağlantısını kapatma
   }
 }
 

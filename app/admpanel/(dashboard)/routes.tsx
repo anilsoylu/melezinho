@@ -2,8 +2,8 @@
 import { useCallback, useMemo } from "react"
 import { useCurrentUser } from "@/hooks/use-current-user"
 
-import { Home, User } from "lucide-react"
-import { usersMenu } from "@/types/dashboard-menu-list"
+import { Dna, Home, User } from "lucide-react"
+import { tokensMenu, usersMenu } from "@/types/dashboard-menu-list"
 
 export const dashboardPrefix = "/admpanel"
 
@@ -13,7 +13,6 @@ type Route = {
   childrenName?: string
   icon?: JSX.Element
   isAdmin?: boolean
-  isSuperAdmin?: boolean
   children?: Route[]
 }
 
@@ -24,9 +23,7 @@ const useDashboardMenu = () => {
   const filterRoutes = useCallback(
     (routes: Route[]): Route[] =>
       routes
-        .filter(
-          (route) => !route.isSuperAdmin || (route.isSuperAdmin && isSuperAdmin)
-        )
+        .filter((route) => !route.isAdmin || (route.isAdmin && isSuperAdmin))
         .map((route) => ({
           ...route,
           children: route.children ? filterRoutes(route.children) : undefined,
@@ -41,6 +38,13 @@ const useDashboardMenu = () => {
         path: dashboardPrefix,
         childrenName: dashboardPrefix,
         icon: <Home />,
+      },
+      {
+        name: "Token Listesi",
+        path: `${dashboardPrefix}/${tokensMenu}`,
+        childrenName: dashboardPrefix,
+        isAdmin: true,
+        icon: <Dna />,
       },
       {
         name: "Üye Listesi",

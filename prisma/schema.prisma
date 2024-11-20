@@ -57,6 +57,7 @@ model Session {
 model Seller {
   id            String         @id @default(cuid())
   name          String        @unique
+  isActivated   Boolean        @default(true)
   products      Product[]
 }
 
@@ -66,6 +67,8 @@ model Product {
   date          DateTime
   price         Float
   quantity      Int
+  isPaid        Boolean        @default(true)
+  isActivated   Boolean        @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

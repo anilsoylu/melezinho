@@ -44,3 +44,14 @@ export const ProfileSchema = z
       path: ["password"],
     }
   )
+
+export const OrderBySchema = z.object({
+  orderBy: z.number(),
+})
+
+export const SellerSchema = z.object({
+  name: z.string().min(1, {
+    message: "İsim gereklidir",
+  }),
+  isActivated: z.boolean().optional().default(true),
+})

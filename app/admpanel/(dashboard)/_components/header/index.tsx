@@ -61,12 +61,6 @@ const Header = () => {
           >
             {`Profil`}
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => router.push(`${dashboardPrefix}/withdrawals`)}
-            className="bg-green-500"
-          >
-            {`Çekim Talebi`}
-          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
             <DropdownMenuSub>
