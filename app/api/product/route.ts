@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
     const newProduct = await db.product.create({
       data: {
         sellerId: data.sellerId,
+        name: data.name,
         date: data.date ?? new Date(),
         price: data.price,
         quantity: data.quantity,

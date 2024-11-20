@@ -2,13 +2,12 @@
 import { useState } from "react"
 import useApi from "@/hooks/use-api"
 import { useCustomToast } from "@/hooks/use-custom-toast"
-import { useFolderFromPath } from "@/hooks/use-folder-path"
 import { useBlock } from "@/context/block-context"
 import wait from "@/hooks/use-wait"
 
 import { Button } from "@/components/ui/button"
 import { MinusCircle } from "lucide-react"
-import { useCurrentUser } from "@/hooks/use-current-user"
+import { tokenApi } from "@/types/api-folder"
 
 type Props = {
   selectedIds: string[]
@@ -21,14 +20,12 @@ const SelectedDeleteRows = ({
   setRowSelection,
   setHideData,
 }: Props) => {
-  const user = useCurrentUser()
   const { isBlock, setIsBlock } = useBlock()
-  const folder = useFolderFromPath()
   const showToast = useCustomToast()
   const { deleteMultiIdsApi } = useApi()
   const [isPending, setIsPending] = useState(false)
 
-  const deleteSelectedUsers = async () => {
+  const deleteSelectedTokens = async () => {
     wait().then(() => {
       setIsBlock && setIsBlock(false)
     })
@@ -38,16 +35,16 @@ const SelectedDeleteRows = ({
     try {
       if (
         confirm(
-          "Seçili kullanıcıları silmek istediğinize emin misiniz? Bu işlem geri alınamaz."
+          "Seçili tokenları silmek istediğinize emin misiniz? Bu işlem geri alınamaz."
         )
       ) {
         const [data, error] = await deleteMultiIdsApi(
           selectedIds.join(","),
-          folder
+          tokenApi
         )
         if (error) {
           throw new Error(
-            `Kullanıcı silme işlemi başarısız oldu. Hata: ${error.message}`
+            `Tokenlerı silme işlemi başarısız oldu. Hata: ${error.message}`
           )
         }
         setHideData((prev) =>
@@ -58,18 +55,16 @@ const SelectedDeleteRows = ({
         })
 
         showToast({
-          title: `Kullanıcılar başarıyla silindi`,
-          description: `Seçili kullanıcılar başarıyla silindi.`,
+          title: `Tokenler başarıyla silindi`,
+          description: `Seçili tokenler başarıyla silindi.`,
           variant: "success",
         })
       }
     } catch (error) {
-      console.log(
-        `Seçili kullanıcılar silinirken bir hata oluştu. Hata: ${error}`
-      )
+      console.log(`Seçili tokenler silinirken bir hata oluştu. Hata: ${error}`)
       showToast({
-        title: `Seçili Kullanıcılar Silinemedi`,
-        description: `Seçili kullanıcılar silinirken bir hata oluştu. Hata: ${error}`,
+        title: `Seçili Tokenler Silinemedi`,
+        description: `Seçili tokenler silinirken bir hata oluştu. Hata: ${error}`,
         variant: "destructive",
       })
     } finally {
@@ -80,7 +75,7 @@ const SelectedDeleteRows = ({
   return (
     <Button
       disabled={isPending || !selectedIds.length}
-      onClick={deleteSelectedUsers}
+      onClick={deleteSelectedTokens}
       className="bg-destructive hover:bg-red-900/40 text-white h-7 gap-1"
     >
       <MinusCircle className="h-3.5 w-3.5" />

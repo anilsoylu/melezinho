@@ -1,6 +1,6 @@
 "use client"
 import { useBlock } from "@/context/block-context"
-import { ProductColumn } from "./columns"
+import { ProductColumnPaid } from "./columns"
 import { useFolderFromPath } from "@/hooks/use-folder-path"
 import useApi from "@/hooks/use-api"
 import { useState } from "react"
@@ -14,17 +14,17 @@ import { TOKEN_API } from "@/types/api-list"
 import { tokenApi } from "@/types/api-folder"
 
 type Props = {
-  data: ProductColumn
+  data: ProductColumnPaid
   setData: (updater: (prev: any[]) => any[]) => void
 }
 
-const CellAvailableAction = ({ data, setData }: Props) => {
+const CellPaidAction = ({ data, setData }: Props) => {
   const { isBlock, setIsBlock } = useBlock()
   const showToast = useCustomToast()
   const folder = useFolderFromPath()
   const { updateAvailableApi } = useApi()
   const [isPending, setIsPending] = useState(false)
-  const [value, setValue] = useState(data.isActivated || false)
+  const [value, setValue] = useState(data.isPaid || false)
   const user = useCurrentUser()
 
   const onChange = async () => {
@@ -45,29 +45,29 @@ const CellAvailableAction = ({ data, setData }: Props) => {
     }
 
     const [updatedData, error] = await updateAvailableApi(data.id, tokenApi, {
-      isActivated: !value,
+      isPaid: !value,
     })
 
     if (error) {
       console.error(
-        `Token güncelleme işlemi başarısız oldu. Hata: ${error.message}`
+        `Token ödeme durumu işlemi başarısız oldu. Hata: ${error.message}`
       )
       showToast({
         title: "Güncelleme Başarısız",
-        description: `Token durumu güncellenirken bir hata oluştu. Hata: ${error.message}`,
+        description: `Token ödeme durumu güncellenirken bir hata oluştu. Hata: ${error.message}`,
         variant: "destructive",
       })
       setIsPending(false)
       return
     }
 
-    setValue(updatedData.isActivated)
+    setValue(updatedData.isPaid)
     setData((prev) =>
       prev.map((token) =>
         token.id === data.id
           ? {
               ...token,
-              isActivated: updatedData.isActivated,
+              isPaid: updatedData.isPaid,
             }
           : token
       )
@@ -75,9 +75,9 @@ const CellAvailableAction = ({ data, setData }: Props) => {
     mutate(TOKEN_API)
 
     showToast({
-      title: "Token Durumu Güncellendi",
-      description: `Token durumu başarıyla güncellendi. Yeni durum: ${
-        updatedData.isActivated ? "Aktif" : "Pasif"
+      title: "Token Ödeme Durumu Güncellendi",
+      description: `Token ödeme durumu başarıyla güncellendi. Yeni durum: ${
+        updatedData.isPaid ? "Aktif" : "Pasif"
       }`,
       variant: "success",
     })
@@ -94,4 +94,4 @@ const CellAvailableAction = ({ data, setData }: Props) => {
   )
 }
 
-export default CellAvailableAction
+export default CellPaidAction

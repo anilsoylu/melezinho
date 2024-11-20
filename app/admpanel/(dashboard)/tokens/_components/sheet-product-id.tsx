@@ -17,16 +17,16 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { DotsHorizontalIcon } from "@radix-ui/react-icons"
-import { Seller } from "@prisma/client"
+import { Product } from "@prisma/client"
 import { useCurrentUser } from "@/hooks/use-current-user"
 
 type Props = {
-  seller: Seller
+  data: Product
   setData: (updater: (prev: any[]) => any[]) => void
-  onDeleteSeller: (sellerId: string) => void
+  onDeleteProduct: (productId: string) => void
 }
 
-const SheetSellerId = ({ seller, setData, onDeleteSeller }: Props) => {
+const SheetProductId = ({ data, setData, onDeleteProduct }: Props) => {
   const user = useCurrentUser()
   const { isBlock, setIsBlock } = useBlock()
   const folder = useFolderFromPath()
@@ -36,7 +36,7 @@ const SheetSellerId = ({ seller, setData, onDeleteSeller }: Props) => {
   const handleCopyId = async () => {
     setIsBlock(true)
     try {
-      await navigator.clipboard.writeText(seller.id)
+      await navigator.clipboard.writeText(data.id)
 
       showToast({
         title: "ID Kopyalandı",
@@ -56,12 +56,12 @@ const SheetSellerId = ({ seller, setData, onDeleteSeller }: Props) => {
   }
 
   const handleEdit = () => {
-    router.push(`${dashboardPrefix}/${folder}/${seller.id}`)
+    router.push(`${dashboardPrefix}/${folder}/${data.id}`)
   }
 
   const handleDelete = () => {
-    if (confirm(`Seçili satıcıları silmek istediğinize emin misiniz?`)) {
-      onDeleteSeller(seller.id)
+    if (confirm(`Seçili tokenları silmek istediğinize emin misiniz?`)) {
+      onDeleteProduct(data.id)
     }
   }
 
@@ -90,4 +90,4 @@ const SheetSellerId = ({ seller, setData, onDeleteSeller }: Props) => {
   )
 }
 
-export default SheetSellerId
+export default SheetProductId

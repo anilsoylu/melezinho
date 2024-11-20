@@ -44,24 +44,24 @@ import { getColumns } from "./columns"
 import { ListFilter, PlusCircle } from "lucide-react"
 import SelectedDeleteRows from "./select-delete"
 import { dashboardPrefix } from "@/app/admpanel/(dashboard)/routes"
-import { Seller } from "@prisma/client"
+import { Product } from "@prisma/client"
 
 type Props = {
   title: string
   description: string
   folder: string
-  sellerList: Seller[]
-  onDeleteSeller(sellerId: string): void
+  tokenListData: Product[]
+  onDeleteProduct(productId: string): void
 }
 
 type RowSelectionType = { [key: string]: boolean }
 
-const SellerDataTable = ({
+const ProductDataTable = ({
   title,
   description,
   folder,
-  sellerList,
-  onDeleteSeller,
+  tokenListData,
+  onDeleteProduct,
 }: Props) => {
   const router = useRouter()
   const [sorting, setSorting] = useState<SortingState>([])
@@ -71,8 +71,8 @@ const SellerDataTable = ({
 
   const [hideData, setHideData] = useState<any[]>([])
   useEffect(() => {
-    setHideData(sellerList)
-  }, [sellerList])
+    setHideData(tokenListData)
+  }, [tokenListData])
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 25,
@@ -81,7 +81,7 @@ const SellerDataTable = ({
   const columns: ColumnDef<any, any>[] = getColumns(
     folder,
     setHideData,
-    onDeleteSeller
+    onDeleteProduct
   )
 
   const table = useReactTable({
@@ -113,7 +113,7 @@ const SellerDataTable = ({
     <div className="space-y-5">
       <div className="flex gap-4 items-center">
         <Input
-          placeholder="Satıcı İsmi filtrele"
+          placeholder="Token filtrele"
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
@@ -254,7 +254,7 @@ const SellerDataTable = ({
                 </strong>{" "}
                 {`toplam`}{" "}
                 <strong>{table.getFilteredRowModel().rows.length}</strong>{" "}
-                {`Kayıtlı IBAN`}
+                {`Kayıtlı Token`}
               </div>
               <div className="flex space-x-2">
                 <Button
@@ -294,4 +294,4 @@ const SellerDataTable = ({
   )
 }
 
-export default SellerDataTable
+export default ProductDataTable

@@ -5,7 +5,13 @@ export const userNoImages = "/dashboard/admin.png"
 export type Available = {
   id: string
   title: string
-  isAvailable: boolean
+  isActivated: boolean
+}
+
+export type ProductPaid = {
+  id: string
+  title: string
+  isPaid: boolean
 }
 
 export type UserAvailable = {

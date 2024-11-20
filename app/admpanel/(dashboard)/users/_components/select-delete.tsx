@@ -9,6 +9,7 @@ import wait from "@/hooks/use-wait"
 import { Button } from "@/components/ui/button"
 import { MinusCircle } from "lucide-react"
 import { useCurrentUser } from "@/hooks/use-current-user"
+import { sellerApi } from "@/types/api-folder"
 
 type Props = {
   selectedIds: string[]
@@ -43,7 +44,7 @@ const SelectedDeleteRows = ({
       ) {
         const [data, error] = await deleteMultiIdsApi(
           selectedIds.join(","),
-          folder
+          sellerApi
         )
         if (error) {
           throw new Error(

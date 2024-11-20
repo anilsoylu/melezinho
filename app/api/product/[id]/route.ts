@@ -62,7 +62,15 @@ export async function PATCH(
 
     const updatedProduct = await db.product.update({
       where: { id: productId },
-      data,
+      data: {
+        sellerId: data.sellerId,
+        name: data.name,
+        date: data.date ?? new Date(),
+        price: data.price,
+        quantity: data.quantity,
+        isPaid: data.isPaid ?? false,
+        isActivated: data.isActivated ?? true,
+      },
     })
 
     return NextResponse.json(updatedProduct, { status: 200 })

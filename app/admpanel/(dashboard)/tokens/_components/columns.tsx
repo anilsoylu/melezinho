@@ -2,17 +2,19 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 
-import { UserAvailable } from "@/types/dashboard"
+import { Available, ProductPaid } from "@/types/dashboard"
 import { Checkbox } from "@/components/ui/checkbox"
-import SheetSellerId from "./sheet-seller-id"
+import SheetProductId from "./sheet-product-id"
 import CellAvailableAction from "./cell-available-action"
+import CellPaidAction from "./cell-paid-action"
 
-export type UserColumn = UserAvailable
+export type ProductColumn = Available
+export type ProductColumnPaid = ProductPaid
 
 export const getColumns = (
   folder: string,
   setData: (updater: (prev: any[]) => any[]) => void,
-  onDeleteSeller: (sellerId: string) => void
+  onDeleteProduct: (productId: string) => void
 ): ColumnDef<any, any>[] => [
   {
     id: "select",
@@ -44,13 +46,13 @@ export const getColumns = (
     size: 50,
     header: () => <span className="px-4">Düzenle</span>,
     cell: ({ row }) => {
-      const seller = row.original
+      const product = row.original
 
       return (
-        <SheetSellerId
-          seller={seller}
+        <SheetProductId
+          data={product}
           setData={setData}
-          onDeleteSeller={onDeleteSeller}
+          onDeleteProduct={onDeleteProduct}
         />
       )
     },
@@ -64,6 +66,21 @@ export const getColumns = (
     enableHiding: false,
   },
   {
+    accessorKey: "isPaid",
+    size: 50,
+    header: () => <span className="px-4">Ödeme</span>,
+    cell: ({ row }) => (
+      <CellPaidAction
+        setData={setData}
+        data={{
+          id: row.original.id,
+          isPaid: row.original.isPaid,
+          title: row.original.title,
+        }}
+      />
+    ),
+  },
+  {
     accessorKey: "isActivated",
     size: 50,
     header: () => <span className="px-4">Durum</span>,
@@ -73,7 +90,7 @@ export const getColumns = (
         data={{
           id: row.original.id,
           isActivated: row.original.isActivated,
-          name: row.original.name,
+          title: row.original.title,
         }}
       />
     ),

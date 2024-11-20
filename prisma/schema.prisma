@@ -64,6 +64,7 @@ model Seller {
 model Product {
   id            String         @id @default(cuid())
   sellerId      String
+  title          String
   date          DateTime
   price         Float
   quantity      Int
