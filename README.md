@@ -6,7 +6,7 @@ Node version 20.x
 
 ### Cloning the repository
 
-    git clone https://github.com/anilsoylu/anilsoylu-new.git
+    git clone https://github.com/anilsoylu/melezinho.git
 
 ### Install packages
 
