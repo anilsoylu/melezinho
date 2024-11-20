@@ -1,5 +1,7 @@
+import HomePage from "@/app/admpanel/(dashboard)/_components/Home"
+
 const DashboardPage = () => {
-  return <div>DashboardPage</div>
+  return <HomePage />
 }
 
 export default DashboardPage
