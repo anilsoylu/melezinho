@@ -56,20 +56,12 @@ const useApi = (basePath: string = "/api") => {
   const updateApi = (id: string, folder: string, data: any) =>
     fetchApi(`/${folder}/${id}`, "PATCH", data)
   const resetApi = (folder: string) => fetchApi(`/${folder}/reset`, "PATCH")
-  const updateApiMarkAsRead = (id: string, folder: string, data: any) =>
-    fetchApi(`/${folder}/${id}/mark-as-read`, "PATCH", data)
   const updateAvailableApi = (id: string, folder: string, data: any) =>
     fetchApi(`/${folder}/${id}/status`, "PATCH", data)
-  const updateUseApi = (id: string, folder: string, data: any) =>
-    fetchApi(`/${folder}/${id}/use`, "PATCH", data)
-  const update2faApi = (id: string, folder: string, data: any) =>
-    fetchApi(`/${folder}/${id}/2fa`, "PATCH", data)
-  const updateLanguagePanelApi = (id: string, folder: string, data: any) =>
-    fetchApi(`/${folder}/${id}/panel`, "PATCH", data)
+  const updatePaidApi = (id: string, folder: string, data: any) =>
+    fetchApi(`/${folder}/${id}/paid`, "PATCH", data)
   const updateLanguageDefaultApi = (id: string, folder: string, data: any) =>
     fetchApi(`/${folder}/${id}/default`, "PATCH", data)
-  const updateOrderByApi = (id: string, folder: string, data: any) =>
-    fetchApi(`/${folder}/${id}/order`, "PATCH", data)
   const deleteMultiIdsApi = (ids: string, folder: string) => {
     return fetchApi(`/${folder}/multi-ids/${ids}`, "DELETE")
   }
@@ -84,14 +76,10 @@ const useApi = (basePath: string = "/api") => {
     updateApi,
     resetApi,
     updateAvailableApi,
-    updateUseApi,
-    update2faApi,
-    updateOrderByApi,
+    updatePaidApi,
     deleteMultiIdsApi,
     deleteMultiPageIdsApi,
-    updateLanguagePanelApi,
     updateLanguageDefaultApi,
-    updateApiMarkAsRead,
   }
 }
 

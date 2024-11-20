@@ -55,3 +55,18 @@ export const SellerSchema = z.object({
   }),
   isActivated: z.boolean().optional().default(true),
 })
+
+export const TokenSchema = z.object({
+  sellerId: z.string(),
+  title: z.string().min(1, "Title is required"),
+  date: z.date({
+    required_error: "Date is required",
+  }),
+  price: z.number().positive("Price must be a positive number"),
+  quantity: z
+    .number()
+    .int()
+    .nonnegative("Quantity must be a non-negative integer"),
+  isPaid: z.boolean().default(true),
+  isActivated: z.boolean().default(true),
+})

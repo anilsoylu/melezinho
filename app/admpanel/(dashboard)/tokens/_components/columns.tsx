@@ -7,6 +7,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 import SheetProductId from "./sheet-product-id"
 import CellAvailableAction from "./cell-available-action"
 import CellPaidAction from "./cell-paid-action"
+import { format } from "date-fns"
+import { tr } from "date-fns/locale"
 
 export type ProductColumn = Available
 export type ProductColumnPaid = ProductPaid
@@ -60,9 +62,39 @@ export const getColumns = (
     enableSorting: false,
   },
   {
-    accessorKey: "name",
-    header: () => <span className="px-4">İsmi</span>,
-    cell: ({ row }) => <>{row.original.name}</>,
+    accessorKey: "sellerId",
+    header: () => <span className="px-4">Satıcı</span>,
+    cell: ({ row }) => <>{row.original.seller.name}</>,
+    enableHiding: false,
+  },
+  {
+    accessorKey: "title",
+    header: () => <span className="px-4">Başlık</span>,
+    cell: ({ row }) => <>{row.original.title}</>,
+    enableHiding: false,
+  },
+  {
+    accessorKey: "quantity",
+    header: () => <span className="px-4">Adet</span>,
+    cell: ({ row }) => <>{row.original.quantity}</>,
+    enableHiding: false,
+  },
+  {
+    accessorKey: "price",
+    header: () => <span className="px-4">Fiyat</span>,
+    cell: ({ row }) => <>{row.original.price}</>,
+    enableHiding: false,
+  },
+  {
+    accessorKey: "date",
+    header: () => <span className="px-4">Tarih</span>,
+    cell: ({ row }) => (
+      <>
+        {format(row.original.date, "dd MMMM yyyy", {
+          locale: tr,
+        })}
+      </>
+    ),
     enableHiding: false,
   },
   {

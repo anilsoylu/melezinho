@@ -2,54 +2,55 @@ import { db } from "@/lib/db"
 import { verifyAuthorization } from "@/lib/verify-api"
 import { NextRequest, NextResponse } from "next/server"
 
+const handleError = (message: string, status: number) =>
+  NextResponse.json({ error: message }, { status })
+
+const withAuthorization = async (
+  req: NextRequest,
+  sellerId: string,
+  handler: (sellerId: string, req: NextRequest) => Promise<NextResponse>
+): Promise<NextResponse> => {
+  const authResponse = await verifyAuthorization(req)
+  if (authResponse) return authResponse
+
+  if (!sellerId) {
+    return handleError("Seller ID not provided", 400)
+  }
+
+  try {
+    return await handler(sellerId, req)
+  } catch (error) {
+    console.error("Server Error:", error)
+    return handleError("Internal Server Error", 500)
+  }
+}
+
 async function fetchSellerById(sellerId: string) {
-  return await db.seller.findUnique({ where: { id: sellerId } })
+  return db.seller.findUnique({ where: { id: sellerId } })
 }
 
 export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const authResponse = await verifyAuthorization(req)
-  if (authResponse) return authResponse
-
-  const sellerId = params.id
-  if (!sellerId) {
-    return NextResponse.json(
-      { error: "Seller ID not provided" },
-      { status: 400 }
-    )
-  }
-
-  try {
+  return withAuthorization(req, params.id, async (sellerId) => {
     const seller = await fetchSellerById(sellerId)
+
     if (!seller) {
-      return NextResponse.json({ error: "Seller not found" }, { status: 404 })
+      return handleError("Seller not found", 404)
     }
+
     return NextResponse.json(seller, { status: 200 })
-  } catch (error) {
-    console.error("GET Seller Error:", error)
-    return NextResponse.json({ error: "Server error" }, { status: 500 })
-  }
+  })
 }
 
 export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const authResponse = await verifyAuthorization(req)
-  if (authResponse) return authResponse
-
-  const sellerId = params.id
-  if (!sellerId) {
-    return NextResponse.json(
-      { error: "Seller ID not provided" },
-      { status: 400 }
-    )
-  }
-
-  try {
+  return withAuthorization(req, params.id, async (sellerId) => {
     const data = await req.json()
+
     if (data.isActive) {
       const activeSeller = await db.seller.findFirst({
         where: { isActivated: true },
@@ -66,32 +67,15 @@ export async function PATCH(
     })
 
     return NextResponse.json(updatedSeller, { status: 200 })
-  } catch (error) {
-    console.error("PATCH Seller Error:", error)
-    return NextResponse.json({ error: "Server error" }, { status: 500 })
-  }
+  })
 }
 
 export async function DELETE(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const authResponse = await verifyAuthorization(req)
-  if (authResponse) return authResponse
-
-  const sellerId = params.id
-  if (!sellerId) {
-    return NextResponse.json(
-      { error: "Seller ID not provided" },
-      { status: 400 }
-    )
-  }
-
-  try {
+  return withAuthorization(req, params.id, async (sellerId) => {
     const deletedSeller = await db.seller.delete({ where: { id: sellerId } })
     return NextResponse.json(deletedSeller, { status: 200 })
-  } catch (error) {
-    console.error("DELETE Seller Error:", error)
-    return NextResponse.json({ error: "Server error" }, { status: 500 })
-  }
+  })
 }

@@ -44,13 +44,13 @@ import { getColumns } from "./columns"
 import { ListFilter, PlusCircle } from "lucide-react"
 import SelectedDeleteRows from "./select-delete"
 import { dashboardPrefix } from "@/app/admpanel/(dashboard)/routes"
-import { Seller } from "@prisma/client"
+import { SellerType } from "@/types/product"
 
 type Props = {
   title: string
   description: string
   folder: string
-  sellerList: Seller[]
+  sellerList: SellerType[]
   onDeleteSeller(sellerId: string): void
 }
 

@@ -22,7 +22,7 @@ const CellPaidAction = ({ data, setData }: Props) => {
   const { isBlock, setIsBlock } = useBlock()
   const showToast = useCustomToast()
   const folder = useFolderFromPath()
-  const { updateAvailableApi } = useApi()
+  const { updatePaidApi } = useApi()
   const [isPending, setIsPending] = useState(false)
   const [value, setValue] = useState(data.isPaid || false)
   const user = useCurrentUser()
@@ -44,7 +44,7 @@ const CellPaidAction = ({ data, setData }: Props) => {
       return
     }
 
-    const [updatedData, error] = await updateAvailableApi(data.id, tokenApi, {
+    const [updatedData, error] = await updatePaidApi(data.id, tokenApi, {
       isPaid: !value,
     })
 

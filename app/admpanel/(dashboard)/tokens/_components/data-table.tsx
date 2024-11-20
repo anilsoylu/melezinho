@@ -1,15 +1,6 @@
 "use client"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
-
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -41,20 +32,50 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { getColumns } from "./columns"
-import { ListFilter, PlusCircle } from "lucide-react"
+import { CalendarIcon, ListFilter, PlusCircle } from "lucide-react"
 import SelectedDeleteRows from "./select-delete"
 import { dashboardPrefix } from "@/app/admpanel/(dashboard)/routes"
-import { Product } from "@prisma/client"
+import { ProductType } from "@/types/product"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import {
+  addDays,
+  endOfMonth,
+  format,
+  isAfter,
+  isBefore,
+  startOfMonth,
+  subMonths,
+} from "date-fns"
+import { tr } from "date-fns/locale"
+import { Calendar } from "@/components/ui/calendar"
+import { cn } from "@/lib/utils"
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 type Props = {
   title: string
   description: string
   folder: string
-  tokenListData: Product[]
+  tokenListData: ProductType[]
   onDeleteProduct(productId: string): void
 }
 
 type RowSelectionType = { [key: string]: boolean }
+
+type DateRange = {
+  from: Date | undefined
+  to: Date | undefined
+}
 
 const ProductDataTable = ({
   title,
@@ -64,19 +85,66 @@ const ProductDataTable = ({
   onDeleteProduct,
 }: Props) => {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [rowSelection, setRowSelection] = useState<RowSelectionType>({})
   const [deleteIds, setDeleteIds] = useState<string[]>([])
+  const [filteredData, setFilteredData] = useState<any[]>(tokenListData)
 
   const [hideData, setHideData] = useState<any[]>([])
   useEffect(() => {
-    setHideData(tokenListData)
-  }, [tokenListData])
+    setHideData(filteredData)
+  }, [filteredData])
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 25,
   })
+
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: startOfMonth(subMonths(new Date(), 3)), // Bulunduğumuz tarihten 3 ay önceki ayın ilk günü
+    to: endOfMonth(new Date()), // Bulunduğumuz ayın son günü
+  })
+
+  useEffect(() => {
+    const from = searchParams.get("from")
+    const to = searchParams.get("to")
+
+    setDate({
+      from: from ? new Date(from) : undefined,
+      to: to ? new Date(to) : undefined,
+    })
+  }, [searchParams])
+
+  const handleDateChange = (selectedDate: DateRange | undefined) => {
+    setDate(selectedDate)
+
+    if (!selectedDate?.from && !selectedDate?.to) {
+      setFilteredData(tokenListData) // Tüm veriler
+    } else {
+      setFilteredData(
+        tokenListData.filter((item) => {
+          const itemDate = new Date(item.date)
+          return (
+            (!selectedDate.from || isAfter(itemDate, selectedDate.from)) &&
+            (!selectedDate.to ||
+              isBefore(itemDate, addDays(selectedDate.to, 1)))
+          )
+        })
+      )
+    }
+  }
+
+  // Ödeme durumu filtresi
+  const handlePaymentFilter = (isPaid: boolean) => {
+    setFilteredData(tokenListData.filter((item) => item.isPaid === isPaid))
+  }
+
+  const handleActivationFilter = (isActivated: boolean) => {
+    setFilteredData(
+      tokenListData.filter((item) => item.isActivated === isActivated)
+    )
+  }
 
   const columns: ColumnDef<any, any>[] = getColumns(
     folder,
@@ -103,6 +171,22 @@ const ProductDataTable = ({
   })
 
   useEffect(() => {
+    if (!date?.from && !date?.to) {
+      setHideData(tokenListData)
+    } else {
+      setHideData(
+        tokenListData.filter((item) => {
+          const itemDate = new Date(item.date)
+          return (
+            (!date.from || isAfter(itemDate, date.from)) &&
+            (!date.to || isBefore(itemDate, addDays(date.to, 1))) // Tarih aralığına dahil et
+          )
+        })
+      )
+    }
+  }, [date, tokenListData])
+
+  useEffect(() => {
     const newDeleteIds = Object.keys(rowSelection)
       .filter((key) => rowSelection[key])
       .map((id) => hideData[parseInt(id)].id)
@@ -111,47 +195,120 @@ const ProductDataTable = ({
 
   return (
     <div className="space-y-5">
-      <div className="flex gap-4 items-center">
-        <Input
-          placeholder="Token filtrele"
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
-          }
-          className="h-7 gap-1 max-w-sm"
-        />
+      <div className="flex flex-col lg:flex-row gap-4 items-center">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              type="button"
+              id="date"
+              variant={"outline"}
+              className={cn(
+                "w-full lg:w-[300px] justify-start text-left font-normal",
+                !date && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon />
+              {date?.from ? (
+                date.to ? (
+                  <>
+                    {format(date.from, "LLL dd, y", {
+                      locale: tr,
+                    })}
+                    -{" "}
+                    {format(date.to, "LLL dd, y", {
+                      locale: tr,
+                    })}
+                  </>
+                ) : (
+                  format(date.from, "LLL dd, y")
+                )
+              ) : (
+                <span>Pick a date</span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              initialFocus
+              mode="range"
+              defaultMonth={date?.from}
+              selected={date}
+              onSelect={handleDateChange as any}
+              numberOfMonths={2}
+            />
+          </PopoverContent>
+        </Popover>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 w-full lg:w-auto gap-1"
+            >
+              <ListFilter className="h-3.5 w-3.5" />
+              <span className="sm:whitespace-nowrap">Ödeme</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Filtrelenmiş</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuCheckboxItem
+              className="capitalize"
+              onCheckedChange={() => handlePaymentFilter(true)} // Ödenmiş kayıtları göster
+            >
+              Paid (Ödenmiş)
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem
+              className="capitalize"
+              onCheckedChange={() => handlePaymentFilter(false)} // Ödenmemiş kayıtları göster
+            >
+              Unpaid (Ödenmemiş)
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuCheckboxItem
+              className="capitalize"
+              onCheckedChange={() => setFilteredData(tokenListData)} // Tüm verileri göster
+            >
+              Clear Filter (Filtreyi Temizle)
+            </DropdownMenuCheckboxItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 gap-1 w-full lg:w-auto"
+            >
+              <ListFilter className="h-3.5 w-3.5" />
+              <span className="sm:whitespace-nowrap">Aktif / Pasif</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Filtrelenmiş</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuCheckboxItem
+              className="capitalize"
+              onCheckedChange={() => handleActivationFilter(true)}
+            >
+              Active (Aktif)
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem
+              className="capitalize"
+              onCheckedChange={() => handleActivationFilter(false)}
+            >
+              Inactive (Pasif)
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuCheckboxItem
+              className="capitalize"
+              onCheckedChange={() => setFilteredData(tokenListData)}
+            >
+              Clear Filter (Filtreyi Temizle)
+            </DropdownMenuCheckboxItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <div className="ml-auto flex items-center gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="h-7 gap-1">
-                <ListFilter className="h-3.5 w-3.5" />
-                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                  Filtrele
-                </span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Filtrelenmiş</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {table
-                .getAllColumns()
-                .filter((column) => column.getCanHide())
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
-                        column.toggleVisibility(!!value)
-                      }
-                    >
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  )
-                })}
-            </DropdownMenuContent>
-          </DropdownMenu>
           <SelectedDeleteRows
             selectedIds={deleteIds}
             setHideData={setHideData}

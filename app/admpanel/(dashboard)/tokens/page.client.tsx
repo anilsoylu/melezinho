@@ -13,9 +13,9 @@ import DataError from "@/components/data-error"
 import Loading from "@/components/Loading"
 import { TOKEN_API } from "@/types/api-list"
 import ProductDataTable from "./_components/data-table"
-import { Product } from "@prisma/client"
 import { handleDelete } from "@/lib/apiHelpers"
-import { sellerApi, tokenApi } from "@/types/api-folder"
+import { tokenApi } from "@/types/api-folder"
+import { ProductType } from "@/types/product"
 
 const PageClient = () => {
   const { isBlock, setIsBlock } = useBlock()
@@ -23,7 +23,7 @@ const PageClient = () => {
   const showToast = useCustomToast()
   const user = useCurrentUser()
 
-  const { data: tokenListData, isError } = useFetcher<Product[]>(TOKEN_API)
+  const { data: tokenListData, isError } = useFetcher<ProductType[]>(TOKEN_API)
 
   const title = "Token Listesi"
   const description =

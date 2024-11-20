@@ -3,35 +3,56 @@ import { verifyAuthorization } from "@/lib/verify-api"
 import { NextRequest, NextResponse } from "next/server"
 
 const handleError = (message: string, status: number) =>
-  new NextResponse(JSON.stringify({ error: message }), { status })
+  NextResponse.json({ error: message }, { status })
 
-export async function GET(req: NextRequest) {
+const withAuthorization = async (
+  req: NextRequest,
+  handler: (req: NextRequest) => Promise<NextResponse>
+): Promise<NextResponse> => {
   const authResponse = await verifyAuthorization(req)
   if (authResponse) return authResponse
 
   try {
-    const products = await db.product.findMany()
-    return new NextResponse(JSON.stringify(products), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    })
+    return await handler(req)
   } catch (error) {
-    console.error("Error fetching products:", error)
-    return handleError("Server error", 500)
+    console.error("Server Error:", error)
+    return handleError("Internal Server Error", 500)
   }
 }
 
-export async function POST(req: NextRequest) {
-  const authResponse = await verifyAuthorization(req)
-  if (authResponse) return authResponse
+export async function GET(req: NextRequest) {
+  return withAuthorization(req, async () => {
+    const products = await db.product.findMany({
+      include: { seller: true },
+    })
 
-  try {
+    return NextResponse.json(products, { status: 200 })
+  })
+}
+
+export async function POST(req: NextRequest) {
+  return withAuthorization(req, async (req) => {
     const data = await req.json()
+
+    if (!data.sellerId || !data.title || !data.price || !data.quantity) {
+      return handleError(
+        "Missing required fields: sellerId, title, price, or quantity",
+        400
+      )
+    }
+
+    const seller = await db.seller.findUnique({
+      where: { id: data.sellerId },
+    })
+
+    if (!seller) {
+      return handleError("Invalid sellerId: Seller not found", 404)
+    }
 
     const newProduct = await db.product.create({
       data: {
-        sellerId: data.sellerId,
-        name: data.name,
+        sellerId: seller.id,
+        title: data.title,
         date: data.date ?? new Date(),
         price: data.price,
         quantity: data.quantity,
@@ -41,10 +62,5 @@ export async function POST(req: NextRequest) {
     })
 
     return NextResponse.json(newProduct, { status: 201 })
-  } catch (error) {
-    console.error("Error creating products:", error)
-    return new NextResponse(JSON.stringify({ error: "Server error" }), {
-      status: 500,
-    })
-  }
+  })
 }

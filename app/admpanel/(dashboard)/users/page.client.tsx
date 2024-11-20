@@ -11,10 +11,10 @@ import Wait from "@/hooks/use-wait"
 
 import { SELLER_API } from "@/types/api-list"
 import SellerDataTable from "./_components/data-table"
-import { Seller } from "@prisma/client"
 import { handleDelete } from "@/lib/apiHelpers"
 import { sellerApi } from "@/types/api-folder"
 import { mutate } from "swr"
+import { SellerType } from "@/types/product"
 
 export default function PageClient() {
   const { isBlock, setIsBlock } = useBlock()
@@ -22,7 +22,7 @@ export default function PageClient() {
   const showToast = useCustomToast()
   const user = useCurrentUser()
 
-  const { data: sellerListData, isError } = useFetcher<Seller[]>(SELLER_API)
+  const { data: sellerListData, isError } = useFetcher<SellerType[]>(SELLER_API)
 
   const title = "Satıcı Listesi"
   const description =

@@ -19,10 +19,10 @@ export async function PATCH(
   }
 
   try {
-    const { isActivated } = await req.json()
+    const { isPaid } = await req.json()
 
-    if (typeof isActivated !== "boolean") {
-      return handleError("Invalid or missing 'isActivated' field", 400)
+    if (typeof isPaid !== "boolean") {
+      return handleError("Invalid or missing 'isPaid' field", 400)
     }
 
     const existingProduct = await db.product.findUnique({
@@ -35,7 +35,7 @@ export async function PATCH(
 
     const updatedProduct = await db.product.update({
       where: { id: productId },
-      data: { isActivated },
+      data: { isPaid },
     })
 
     return NextResponse.json(updatedProduct, { status: 200 })

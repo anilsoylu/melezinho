@@ -2,38 +2,47 @@ import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { verifyAuthorization } from "@/lib/verify-api"
 
+const handleError = (message: string, status: number) =>
+  NextResponse.json({ error: message }, { status })
+
+const withAuthorization = async (
+  req: NextRequest,
+  ids: string[],
+  handler: (ids: string[], req: NextRequest) => Promise<NextResponse>
+): Promise<NextResponse> => {
+  const authResponse = await verifyAuthorization(req)
+  if (authResponse) return authResponse
+
+  if (ids.length === 0) {
+    return handleError("Seller IDs missing or invalid", 400)
+  }
+
+  try {
+    return await handler(ids, req)
+  } catch (error) {
+    console.error("Server Error:", error)
+    return handleError("Internal Server Error", 500)
+  }
+}
+
 export async function DELETE(
   req: NextRequest,
   { params }: { params: { ids: string } }
 ) {
-  const authResponse = await verifyAuthorization(req)
-  if (authResponse) return authResponse
+  const ids = params.ids
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean)
 
-  const multiIds =
-    params.ids
-      ?.split(",")
-      .map((id) => id.trim())
-      .filter(Boolean) || []
-
-  if (multiIds.length === 0) {
-    return NextResponse.json({ error: "Seller IDs missing" }, { status: 400 })
-  }
-
-  try {
+  return withAuthorization(req, ids, async (ids) => {
     const deleteSellers = await db.seller.deleteMany({
-      where: { id: { in: multiIds } },
+      where: { id: { in: ids } },
     })
 
     if (deleteSellers.count === 0) {
-      return NextResponse.json(
-        { error: "No Seller found to delete" },
-        { status: 404 }
-      )
+      return handleError("No seller found to delete", 404)
     }
 
-    return NextResponse.json(deleteSellers, { status: 201 })
-  } catch (error) {
-    console.error("IBAN deletion error:", error)
-    return NextResponse.json({ error: "Server error" }, { status: 500 })
-  }
+    return NextResponse.json(deleteSellers, { status: 200 })
+  })
 }
