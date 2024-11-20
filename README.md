@@ -22,17 +22,11 @@ Node version 20.x
     Running commands with pnpm `pnpm dlx auth secret`
     NEXTAUTH_URL=
     AUTH_SECRET=
-    NEXT_PUBLIC_RESEND_API_KEY=
 
 
     NEXT_PUBLIC_APP_URL=
-    NEXT_PUBLIC_IMG_URL=
     NEXT_PUBLIC_API_URL=
-    NEXT_PUBLIC_MAIL_ADDRESS=
-    NEXT_PUBLIC_APP_NAME=
-    NEXT_PUBLIC_APP_DESCRIPTION=
     NEXT_PUBLIC_API_SECRET_TOKEN=
-    NEXT_PUBLIC_PANEL_USER_ID=
 
 ### Setup Prisma
 

@@ -10,7 +10,8 @@
     "db:seed": "bunx tsx lib/seed.ts",
     "db:generate": "bunx prisma generate",
     "db:migrate": "bunx prisma migrate dev",
-    "db:push": "bunx prisma db push"
+    "db:push": "bunx prisma db push",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.4",
