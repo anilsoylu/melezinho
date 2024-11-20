@@ -39,11 +39,18 @@ Node version 20.x
 
     npm run dev
 
-### Available commands
+### Available Commands
 
-Running commands with npm `npm run [command]`
+Running commands with npm: `npm run [command]`
 
-| command | description                              |
-| ------- | ---------------------------------------- |
-| `dev`   | Starts a development instance of the app |
-|         |
+| Command       | Description                                   |
+| ------------- | --------------------------------------------- |
+| `dev`         | Starts a development instance of the app      |
+| `build`       | Builds the app for production                 |
+| `start`       | Starts the production build of the app        |
+| `lint`        | Runs linting to check for code quality issues |
+| `db:seed`     | Seeds the database with initial data          |
+| `db:generate` | Generates Prisma client based on the schema   |
+| `db:migrate`  | Applies new migrations to the database        |
+| `db:push`     | Pushes the schema changes to the database     |
+| `postinstall` | Runs Prisma client generation after install   |
